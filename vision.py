@@ -5,7 +5,6 @@
 import cv2
 import pygame
 import numpy
-import time
 
 
 def get_output(camera):
@@ -15,15 +14,17 @@ def get_output(camera):
     return(frame)
 
 
+def convert_box(box):
+    return((box[1], box[0], box[3], box[2]))
+
+
 # initialize trackers
-fast_tracker = cv2.Tracker_create("MIL")
-# slow_tracker = cv2.TrackerMedianFlow_create()
+fast_tracker = cv2.TrackerKCF_create()
+slow_tracker = cv2.TrackerMedianFlow_create()
 
 camera = cv2.VideoCapture(0)
 
-frame = camera.read()[1]
-
-box = (250, 175, 100, 100)
+box = (175, 250, 100, 100)
 
 pygame.init()
 screen = pygame.display.set_mode([600, 450])
@@ -33,7 +34,8 @@ while(not selected):
     frame = pygame.surfarray.make_surface(get_output(camera))
     screen.blit(frame, (0, 0))
 
-    pygame.draw.rect(screen, (255, 0, 0), box, 1)
+    pgbox = (box[1], box[0], box[3], box[2])
+    pygame.draw.rect(screen, (255, 0, 0), pgbox, 1)
     pygame.display.update()
 
     if(pygame.key.get_pressed()[pygame.K_SPACE]):
@@ -42,6 +44,7 @@ while(not selected):
     pygame.event.pump()
 
 fast_tracker.init(get_output(camera), box)
+slow_tracker.init(get_output(camera), box)
 
 while(True):
 
@@ -49,13 +52,14 @@ while(True):
 
     screen.fill([0, 0, 0])
 
-    box = fast_tracker.update(frame)[1]
+    fast_box = fast_tracker.update(frame)[1]
+    slow_box = slow_tracker.update(frame)[1]
 
     # display screen
     frame = pygame.surfarray.make_surface(frame)
     screen.blit(frame, (0, 0))
 
-    pgbox = (box[1], box[0], box[3], box[2])
-    pygame.draw.rect(screen, (255, 0, 0), pgbox, 1)
+    pygame.draw.rect(screen, (255, 0, 0), convert_box(fast_box), 1)
+    pygame.draw.rect(screen, (0, 255, 0), convert_box(slow_box), 1)
 
     pygame.display.update()
