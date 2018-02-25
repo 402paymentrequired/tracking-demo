@@ -11,10 +11,10 @@ while(True):
 	if no tracking failures:
 		if a ROI image matches a region in the frame:
 			exert influence on both trackers (average?) with identified region
-			increase the confidence in the stored image
+			<i> increase the confidence in the stored image
 				(ex: confidence = 0.5 + 0.5*confidence)
 		else:
-			store a picture of the ROI (confidence = 0.5*confidence of previous match*(something that decreases over time)))
+			<ii> store a picture of the ROI (confidence = 0.5*confidence of previous match*(something that decreases over time)))
 	if one tracking failure:
 		if a ROI image matches with a region in the frame close to the
 		tracker that didn't fail:
@@ -29,4 +29,20 @@ while(True):
 			reinitialize both trackers to the stored image
 
 	confidence should decrease after the passage of time without a match
+```
+
+## functions
+
+## general for confidence
+```
+let tracker_confidence = a
+	tracker_ROI = A
+	recognition_confidence = tracker_confidence * feature_confidence = b_i
+	recognition_ROI = B
+
+b = sup{b_i}
+
+detection confidence = 1 - (1-a)(1-b)
+
+
 ```
